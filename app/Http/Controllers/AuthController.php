@@ -35,4 +35,9 @@ class AuthController extends Controller
             return response()->json('Something went wrong on ther server.'. $e->getCode());
         }
     }
+
+    public function register(Request $request) 
+    {
+        
+    }
 }
