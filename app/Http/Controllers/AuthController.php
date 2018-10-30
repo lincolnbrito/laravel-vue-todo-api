@@ -12,11 +12,11 @@ class AuthController extends Controller
 
         try {
 
-            $response = $http->post('http://laravel-vue-todo-api.local/oauth/token', [
+            $response = $http->post(config('services.passport.login_endpoint'), [
                 'form_params' => [
                     'grant_type' => 'password',
-                    'client_id' => 2,
-                    'client_secret' => 'gPK7gzblJcSm3vXDnZoWN74e5gTEJcLqJPpwAGOU',
+                    'client_id' => config('services.passport.client_id'),
+                    'client_secret' => config('services.passport.client_secret'),
                     'username' => $request->username,
                     'password' => $request->password
                 ],
