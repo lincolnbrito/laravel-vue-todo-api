@@ -35,14 +35,17 @@ class TodosController extends Controller
      */
     public function store(Request $request)
     {
+
         $data = $request->validate([
             'title' => 'required|string',
             'completed' => 'required|boolean'
         ]);
 
-        $request = $request->merge(['user_id' => auth()->user()->id]);
-
-        $todo = Todo::create($request->all());
+        $todo = Todo::create([
+            'user_id' => auth()->user()->id,
+            'title' => $request->title,
+            'completed'=> $request->completed
+        ]);
 
         return response()->json($todo, 201);
     }
@@ -57,6 +60,10 @@ class TodosController extends Controller
      */
     public function update(Request $request, Todo $todo)
     {
+        if($todo->user_id != auth()->user()->id) {
+            return response()->json('Unauthorize',401);
+        }
+
         $data = $request->validate([
             'title' => 'required|string',
             'completed' => 'required|boolean'
@@ -74,7 +81,7 @@ class TodosController extends Controller
             'completed' => 'required|boolean'
         ]);
 
-        Todo::query()->update($data);
+        Todo::where('user_id', auth()->user()->id)->update($data);
 
         return response()->json(['message'=>'Updated', 'success'=>true], 200);
 
@@ -89,6 +96,10 @@ class TodosController extends Controller
      */
     public function destroy(Todo $todo)
     {
+        if($todo->user_id != auth()->user()->id) {
+            return response()->json('Unauthorize',401);
+        }
+
         $todo->delete();
 
         return response()->json(['message'=>'Deleted todo item', 'success'=>true], 200);
@@ -96,6 +107,23 @@ class TodosController extends Controller
 
     public function destroyCompleted(Request $request)
     {
+
+        $todosToDelete = $request->todos;
+
+        $userTodoIds = auth()->user()->todos->map(function($todo){
+            return $todo->id;
+        });
+
+        $valid = collect($todosToDelete)->every(function($value, $key) use($userTodoIds){
+            return $userTodoIds->contains($value);
+        });
+
+        if(!$valid) {
+            return response()->json('Unauthorized', 401);
+        }
+
+
+
         $data = $request->validate([
             'todos' => 'required|array'
         ]);
