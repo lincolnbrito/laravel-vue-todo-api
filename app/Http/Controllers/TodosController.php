@@ -14,7 +14,7 @@ class TodosController extends Controller
      */
     public function index()
     {
-        return Todo::all();
+        return Todo::where('user_id', auth()->user()->id)->get();
     }
 
     /**
@@ -39,6 +39,8 @@ class TodosController extends Controller
             'title' => 'required|string',
             'completed' => 'required|boolean'
         ]);
+
+        $request = $request->merge(['user_id' => auth()->user()->id]);
 
         $todo = Todo::create($request->all());
 
