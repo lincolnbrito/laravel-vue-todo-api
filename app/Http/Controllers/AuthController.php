@@ -24,16 +24,15 @@ class AuthController extends Controller
                 ],
                 'exceptions' => false,
             ]);
-
+            //print_r($response->getStatusCode());
+            if($response->getStatusCode() == 400 ){
+                return response($response->getBody(), $response->getStatusCode());
+            }else if($response->getStatusCode() == 401 ){
+                return response($response->getBody(), $response->getStatusCode());
+            }
             return $response->getBody();
 
-        }catch(\GuzzleHttp\Exception\BadRequestException $e) {
-            if($e->getCode == 400 ){
-                return response()->jsogn('Invalid Request. Please enter a username or a password', $e->getCode());
-            }else if($e->getCode == 401 ){
-                return response()->jsogn('Your credentials are incorrect. Please tray again', $e->getCode());
-            }
-
+        }catch(\GuzzleHttp\Exception\RequestException $e) {
             return response()->json('Something went wrong on ther server.'. $e->getCode());
         }
     }
