@@ -24,7 +24,7 @@ class AuthController extends Controller
                 ],
                 'exceptions' => false,
             ]);
-            //print_r($response->getStatusCode());
+
             if($response->getStatusCode() == 400 ){
                 return response($response->getBody(), $response->getStatusCode());
             }else if($response->getStatusCode() == 401 ){
